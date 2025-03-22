@@ -6,8 +6,17 @@ import {Big, SMA} from 'trading-signals';
 
 /*
 
+============
+HTTP REQUEST
+============
+
 KY
 https://medium.com/@muzammilsyed270300/why-you-should-use-ky-instead-of-axios-for-http-requests-in-your-frontend-2c7878be3b30
+
+
+=======
+BINANCE
+=======
 
 probni api endpointi
 https://developers.binance.com/docs/binance-spot-api-docs/rest-api/market-data-endpoints#compressedaggregate-trades-list
@@ -24,8 +33,7 @@ days	1d, 3d
 weeks	1w
 months	1M
 
-
-binance json response
+Binance json response
  [
    [
      1499040000000,      // [0] Kline open time
@@ -44,16 +52,29 @@ binance json response
  ]
 
 
+==================
+TECHINCAL ANALYSIS
+==================
+
 trading-signals
+(~2025)
 https://www.npmjs.com/package/trading-signals?activeTab=readme
+https://github.com/bennycode/trading-signals
+https://bennycode.com/trading-signals/
 npm install trading-signals
 
 
 Indicator TS
+(~2025)
 https://github.com/cinar/indicatorts
 npm install indicatorts
 
- */
+moving-averages
+(~2021)
+https://www.npmjs.com/package/moving-averages?activeTab=versions
+
+
+*/
 
 
 
