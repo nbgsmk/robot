@@ -135,10 +135,10 @@ app.get('/klines_test', async (req, res) => {
 });
 
 
-app.get('/klines/:symbol/:interval', async (req, res) => {
+app.get('/klines/:symbol/:interval/:limit', async (req, res) => {
 	try {
-		const { symbol, interval } = req.params;
-		const reqs = `https://api.binance.com/api/v3/klines?symbol=${symbol}&interval=${interval}&limit=60`;
+		const { symbol, interval, limit } = req.params;
+		const reqs = `https://api.binance.com/api/v3/klines?symbol=${symbol}&interval=${interval}&limit=${limit}`;
 		console.log('request=' + reqs);
 		const reqsOpcije = { name: 'Alice', age: 25 };
 		const response = await ky.get(reqs, reqsOpcije);
@@ -158,13 +158,13 @@ app.get('/klines/:symbol/:interval', async (req, res) => {
 			low: d[3] * 1,
 			close: d[4] * 1,
 
-			volume: d[5],
-			volumeFast: volSmaF.add(d[5]),
-			volumeSlow: volSmaS.add(d[5]),
+			volume: d[5] *1,
+			volumeFast: volSmaF.add(d[5]) *1,
+			volumeSlow: volSmaS.add(d[5]) *1,
 
-			numtrades: d[8],
-			numtradesFast: tradeSmaF.add(d[8]),
-			numtradesSlow: tradeSmaS.add(d[8]),
+			numtrades: d[8] *1,
+			numtradesFast: tradeSmaF.add(d[8]) *1,
+			numtradesSlow: tradeSmaS.add(d[8]) *1,
 
 		}));
 
