@@ -82,15 +82,15 @@ const tradeSMAm = chart.addSeries(LineSeries, { color: '#029999', lineWidth: 1, 
 const tradeSMAs = chart.addSeries(LineSeries, { color: '#025599', lineWidth: 1, priceFormat: {type: 'volume',},}, 2,);
 
 // price delta
-const deltaSeriesOC = chart.addSeries(LineSeries, { color: '#02bb99', lineWidth: 1, priceFormat: {type: 'volume',},}, 3,);
-const deltaSeriesHL = chart.addSeries(LineSeries, { color: '#920000', lineWidth: 1, priceFormat: {type: 'volume',},}, 3,);
+const deltaSeriesOC = chart.addSeries(LineSeries, { color: '#920000', lineWidth: 1, priceFormat: {type: 'volume',},}, 3,);
+const deltaSeriesHL = chart.addSeries(LineSeries, { color: '#02bb99', lineWidth: 1, priceFormat: {type: 'volume',},}, 3,);
 
 
 // LEGENDE
 const l1 = new Legenda('tv_chart');
-const twm_v = new TextWater(chart, 1, 'volume');
-const twm_s = new TextWater(chart, 2, 'trading speed');
-const twm_d = new TextWater(chart, 3, 'price delta');
+const wmV = new TextWater(chart, 1, 'volume');
+const wmS = new TextWater(chart, 2, 'trading speed');
+const wmD = new TextWater(chart, 3, 'price delta');
 
 async function getData(symbol, interval, limit) {
 	const url = "http://localhost:3000/klines/" + symbol + "/" + interval + "/" + limit;
@@ -136,7 +136,8 @@ async function getData(symbol, interval, limit) {
 
 		// price gradient
 		deltaSeriesOC.setData(data.map(item => ({time: item.time, value: (item.close - item.open),})));
-		deltaSeriesHL.setData(data.map(item => ({time: item.time, value: (item.high - item.low),})));
+		// deltaSeriesHL.setData(data.map(item => ({time: item.time, value: (item.high - item.low),})));
+		deltaSeriesHL.setData(data.map(item => ({time: item.time, value: item.delta.fast,})));
 
 		l1.setText(symbol + ' / ' + interval);
 
@@ -146,7 +147,7 @@ async function getData(symbol, interval, limit) {
 	}
 }
 
-const iks = getData("BTCUSDT", "1h", 500);
+const iks = getData("BTCUSDT", "1h", 1000);
 
 chart.timeScale().fitContent();
 

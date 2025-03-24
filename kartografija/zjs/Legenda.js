@@ -12,7 +12,7 @@ export class Legenda {
 	constructor(chartDiv) {
 		const chart = document.getElementById(chartDiv);
 		const legendDiv = document.createElement('div');
-		legendDiv.style = `position: absolute; left: 12px; top: 12px; z-index: 1; font-size: 14px; font-family: sans-serif; line-height: 18px; font-weight: 300;`;
+		legendDiv.style = `position: absolute; left: 12px; top: 12px; z-index: 1; font-size: 24px; font-family: sans-serif; line-height: 28px; font-weight: 500;`;
 		chart.appendChild(legendDiv);
 		this.row1 = document.createElement('div');
 		// this.row1.innerHTML = 'legend placeholder';

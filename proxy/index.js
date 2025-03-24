@@ -85,7 +85,7 @@ app.listen(lp, () => {
 	console.log('server na portu http://localhost:' + lp);
 })
 
-console.log(new Date(8.64e15).toString());
+console.log(new Date().toString());
 
 app.get('/', async (req, res) => {
 	try {
@@ -139,6 +139,8 @@ app.get('/klines/:symbol/:interval/:limit', async (req, res) => {
 		const tradeSmaM = new SMA(m)
 		const tradeSmaS = new SMA(s);
 
+		const deltaSma = new SMA(20);
+
 		const vv = data.map((item, index) => ({
 			// i: index,
 			// time: item[0] / 1000,
@@ -155,6 +157,12 @@ app.get('/klines/:symbol/:interval/:limit', async (req, res) => {
 			med: tradeSmaM.add(item[8]) *1,
 			slow: tradeSmaS.add(item[8]) *1,
 		}))
+		const dd = data.map((item, index) => ({
+			// i: index,
+			// time: item[0] / 1000,
+			raw: item[8] *1,
+			fast: deltaSma.add(new Big(item[4] - item[1])) *1,
+		}))
 
 
 		const rezult = data.map((item, index) => ({
@@ -169,6 +177,8 @@ app.get('/klines/:symbol/:interval/:limit', async (req, res) => {
 			vol: vv[index],
 
 			trades: tt[index],
+
+			delta: dd[index],
 		}));
 
 		res.status(200).json(rezult);
