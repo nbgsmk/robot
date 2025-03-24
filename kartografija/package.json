@@ -10,6 +10,9 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
-    "lightweight-charts": "^5.0.3"
+    "lightweight-charts": "^5.0.3",
+    "trading-signals": "^6.2.0",
+    "indicatorts": "^2.2.2",
+    "moving-averages": "^4.0.6"
   }
 }

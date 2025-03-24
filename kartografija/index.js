@@ -5,7 +5,12 @@ import {
 	CandlestickSeries,
 	HistogramSeries,
 	LineStyle
-} from './js/lightweight-charts.standalone.development.mjs';
+} from "./js/lightweight-charts.standalone.development.mjs";
+import { Legenda } from "./zjs/Legenda.js";
+import { TextWater } from './zjs/TextWater.js';
+// import {SMA} from 'trading-signals';
+// import {TEMA} from "indicatorts";
+// import {ma} from "moving-averages";
 
 const chartOptions = {
 	layout: {
@@ -36,7 +41,8 @@ const chartOptions = {
 };
 const chart = createChart(document.getElementById('tv_chart'), chartOptions);
 
-const candleSeries = chart.addSeries(CandlestickSeries, {
+const priceSeries = chart.addSeries(CandlestickSeries, {
+	// title: 'ticker',
 	upColor: '#26a69a', downColor: '#ef5350', borderVisible: false,
 	wickUpColor: '#26a69a', wickDownColor: '#ef5350',
 	priceFormat: {
@@ -44,6 +50,7 @@ const candleSeries = chart.addSeries(CandlestickSeries, {
 		},
 });
 const volumeSeries = chart.addSeries(HistogramSeries, {
+		// title: 'volume',
 		color: '#05530522',
 		lineWidth: 1,
 		priceFormat: {
@@ -52,7 +59,8 @@ const volumeSeries = chart.addSeries(HistogramSeries, {
 	},
 	1 // Pane index
 );
-const speedSeries = chart.addSeries(HistogramSeries, {
+const tradeSeries = chart.addSeries(HistogramSeries, {
+		// title: 'volume',
 		color: '#05530522',
 		lineWidth: 1,
 		priceFormat: {
@@ -61,6 +69,12 @@ const speedSeries = chart.addSeries(HistogramSeries, {
 	},
 	2 // Pane index
 );
+
+const volSMAf = chart.addSeries(LineSeries, { color: '#05530599', lineWidth: 1, priceFormat: {type: 'volume',},}, 1,);
+const volSMAs = chart.addSeries(LineSeries, { color: '#05530599', lineWidth: 1, priceFormat: {type: 'volume',},}, 1,);
+
+const tradeSMAf = chart.addSeries(LineSeries, { color: '#05530599', lineWidth: 1, priceFormat: {type: 'volume',},}, 2,);
+const tradeSMAs = chart.addSeries(LineSeries, { color: '#05530599', lineWidth: 1, priceFormat: {type: 'volume',},}, 2,);
 
 
 
@@ -74,70 +88,47 @@ async function getData(symbol, interval, limit) {
 		const data = await response.json();
 		console.log(data);
 
-		candleSeries.setData(data);
+		priceSeries.setData(data);
 		volumeSeries.setData(
 			data.map(item => ({
 				time: item.time,
 				value: item.volume,
 			}))
 		);
-		speedSeries.setData(
+		tradeSeries.setData(
 			data.map(item => ({
 				time: item.time,
 				value: item.numtrades
 			}))
 		);
-		// lineSeries.setData(data);
+
+		volSMAf.setData(data.map(item => ({time: item.time, value: item.volumeFast,})));
+		volSMAs.setData(data.map(item => ({time: item.time, value: item.volumeSlow,})));
+		tradeSMAf.setData(data.map(item => ({time: item.time, value: item.numtradesFast,})));
+		tradeSMAs.setData(data.map(item => ({time: item.time, value: item.numtradesSlow,})));
+
+		l1.setText(symbol + ' / ' + interval);
+
 
 	} catch (error) {
 		console.error(error.message);
 	}
 }
 
-const iks = getData("ETHUSDT", "4h", 50);
+const iks = getData("BTCUSDT", "5m", 500);
 
 chart.timeScale().fitContent();
 
 
-/////////////
-// LEGEND
-/////////////
-class Legenda {
-	firstRow;
-	constructor() {
-		const container = document.getElementById('tv_chart');
-		const legendDiv = document.createElement('div');
-		legendDiv.style = `position: absolute; left: 12px; top: 12px; z-index: 1; font-size: 14px; font-family: sans-serif; line-height: 18px; font-weight: 300;`;
-		container.appendChild(legendDiv);
-		this.firstRow = document.createElement('div');
-		this.firstRow.innerHTML = 'symbolName';
-		this.firstRow.style.color = 'green';
-		legendDiv.appendChild(this.firstRow);
 
-	}
-	setText(txt){
-		this.firstRow.innerHTML = txt;
-	}
-}
-const l1 = new Legenda();
-l1.setText('patka');
+const l1 = new Legenda('tv_chart');
+// l1.setText('patka');
 
-/////////////////////
-// Watermark
-/////////////////////
-const firstPane = chart.panes()[1];
-const textWatermark = createTextWatermark(firstPane, {
-	vertAlign: 'top',
-	horzAlign: 'left',
-	lines: [
-		{
-			text: 'Watermark',
-			color: '#ff2277ff',
-			fontSize: 14,
-		},
-	],
-});
+const tw1 = new TextWater(chart, 1, 'volume');
+tw1.setText('vol');
 
+const w2 = new TextWater(chart, 2, 'trading speed');
+w2.setText('trades');
 
 //////////////////////
 // Series primitive
@@ -160,3 +151,7 @@ const textWatermark = createTextWatermark(firstPane, {
 
 
 
+/*
+https://tradingview.github.io/lightweight-charts/tutorials/demos/range-switcher
+
+ */
