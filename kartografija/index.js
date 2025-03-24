@@ -1,5 +1,6 @@
 import {
 	createChart,
+	createTextWatermark,
 	LineSeries,
 	CandlestickSeries,
 	HistogramSeries,
@@ -10,25 +11,39 @@ const chartOptions = {
 	layout: {
 		textColor: 'blue',
 		background: {
-			type: 'solid',
-			color: 'white'
+			type: 'gradient',
+			topColor: 'white',
+			bottomColor: '#EEEEEEff'
 		},
 		panes: {
-            separatorColor: '#ff0000ff',
-            separatorHoverColor: '#ff000022',
+            separatorColor: '#777777',
+            separatorHoverColor: '#22222222',
             enableResize: true,
         },
-	}
+	},
+	timeScale: {
+		timeVisible: true,
+		secondsVisible: false,
+	},
+	textWwatermark: {
+		visible: true,
+		fontSize: 34,
+		horzAlign: "center",
+		vertAlign: "bottom",
+		color: 'red',
+		text: 'prices',
+	},
 };
 const chart = createChart(document.getElementById('tv_chart'), chartOptions);
 
 const candleSeries = chart.addSeries(CandlestickSeries, {
 	upColor: '#26a69a', downColor: '#ef5350', borderVisible: false,
 	wickUpColor: '#26a69a', wickDownColor: '#ef5350',
+	priceFormat: {
+			type: 'price',	// percent | price | volume
+		},
 });
-const volumeSeries = chart.addSeries(
-	HistogramSeries,
-	{
+const volumeSeries = chart.addSeries(HistogramSeries, {
 		color: '#05530522',
 		lineWidth: 1,
 		priceFormat: {
@@ -37,9 +52,7 @@ const volumeSeries = chart.addSeries(
 	},
 	1 // Pane index
 );
-const speedSeries = chart.addSeries(
-	HistogramSeries,
-	{
+const speedSeries = chart.addSeries(HistogramSeries, {
 		color: '#05530522',
 		lineWidth: 1,
 		priceFormat: {
@@ -81,7 +94,7 @@ async function getData(symbol, interval, limit) {
 	}
 }
 
-const iks = getData("ETHUSDT", "5m", 500);
+const iks = getData("ETHUSDT", "4h", 50);
 
 chart.timeScale().fitContent();
 
@@ -89,32 +102,61 @@ chart.timeScale().fitContent();
 /////////////
 // LEGEND
 /////////////
-const symbolName = 'Legenda kralju';
-const container = document.getElementById('tv_chart');
-const legend = document.createElement('div');
-legend.style = `position: absolute; left: 12px; top: 12px; z-index: 1; font-size: 14px; font-family: sans-serif; line-height: 18px; font-weight: 300;`;
-container.appendChild(legend);
-const firstRow = document.createElement('div');
-firstRow.innerHTML = symbolName;
-firstRow.style.color = 'green';
-legend.appendChild(firstRow);
+class Legenda {
+	firstRow;
+	constructor() {
+		const container = document.getElementById('tv_chart');
+		const legendDiv = document.createElement('div');
+		legendDiv.style = `position: absolute; left: 12px; top: 12px; z-index: 1; font-size: 14px; font-family: sans-serif; line-height: 18px; font-weight: 300;`;
+		container.appendChild(legendDiv);
+		this.firstRow = document.createElement('div');
+		this.firstRow.innerHTML = 'symbolName';
+		this.firstRow.style.color = 'green';
+		legendDiv.appendChild(this.firstRow);
+
+	}
+	setText(txt){
+		this.firstRow.innerHTML = txt;
+	}
+}
+const l1 = new Legenda();
+l1.setText('patka');
+
+/////////////////////
+// Watermark
+/////////////////////
+const firstPane = chart.panes()[1];
+const textWatermark = createTextWatermark(firstPane, {
+	vertAlign: 'top',
+	horzAlign: 'left',
+	lines: [
+		{
+			text: 'Watermark',
+			color: '#ff2277ff',
+			fontSize: 14,
+		},
+	],
+});
 
 
 //////////////////////
 // Series primitive
 //////////////////////
-class MySeriesPrimitive {
-    /* Class implementing the ISeriesPrimitive interface */
-}
-const mySeriesPrimitive = new MySeriesPrimitive();
-speedSeries.attachPrimitive(mySeriesPrimitive);
+// class MySeriesPrimitive {
+//     /* Class implementing the ISeriesPrimitive interface */
+// }
+// const mySeriesPrimitive = new MySeriesPrimitive();
+// speedSeries.attachPrimitive(mySeriesPrimitive);
 
 ////////////////////
 // Pane primitive
 ////////////////////
-class MyPanePrimitive {
-	/* Class implementing the IPanePrimitive interface */
-}
-const myPanePrimitive = new MyPanePrimitive();
-const mainPane = chart.panes()[1]; // Get the main pane
-mainPane.attachPrimitive(myPanePrimitive);
+// class MyPanePrimitive {
+// 	/* Class implementing the IPanePrimitive interface */
+// }
+// const myPanePrimitive = new MyPanePrimitive();
+// const mainPane = chart.panes()[1]; // Get the main pane
+// mainPane.attachPrimitive(myPanePrimitive);
+
+
+
