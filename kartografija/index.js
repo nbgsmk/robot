@@ -39,6 +39,10 @@ const chartOptions = {
 };
 const chart = createChart(document.getElementById('tv_chart'), chartOptions);
 
+//////////////////
+// uvek postoji
+//////////////////
+// price, volume, number of trades
 const priceSeries = chart.addSeries(CandlestickSeries, {
 	// title: 'ticker',
 	upColor: '#26a69a', downColor: '#ef5350', borderVisible: false,
@@ -64,15 +68,29 @@ const tradeSeries = chart.addSeries(HistogramSeries, {
 		},
 	}, 2, );
 
+////////////////////////
+// indikatori po zelji
+////////////////////////
+// volume SMA
 const volSMAf = chart.addSeries(LineSeries, { color: '#02bb99', lineWidth: 1, priceFormat: {type: 'volume',},}, 1,);
 const volSMAm = chart.addSeries(LineSeries, { color: '#029999', lineWidth: 1, priceFormat: {type: 'volume',},}, 1,);
 const volSMAs = chart.addSeries(LineSeries, { color: '#025599', lineWidth: 1, priceFormat: {type: 'volume',},}, 1,);
 
+// trading speed
 const tradeSMAf = chart.addSeries(LineSeries, { color: '#02bb99', lineWidth: 1, priceFormat: {type: 'volume',},}, 2,);
 const tradeSMAm = chart.addSeries(LineSeries, { color: '#029999', lineWidth: 1, priceFormat: {type: 'volume',},}, 2,);
 const tradeSMAs = chart.addSeries(LineSeries, { color: '#025599', lineWidth: 1, priceFormat: {type: 'volume',},}, 2,);
 
+// price delta
+const deltaSeriesOC = chart.addSeries(LineSeries, { color: '#02bb99', lineWidth: 1, priceFormat: {type: 'volume',},}, 3,);
+const deltaSeriesHL = chart.addSeries(LineSeries, { color: '#920000', lineWidth: 1, priceFormat: {type: 'volume',},}, 3,);
 
+
+// LEGENDE
+const l1 = new Legenda('tv_chart');
+const twm_v = new TextWater(chart, 1, 'volume');
+const twm_s = new TextWater(chart, 2, 'trading speed');
+const twm_d = new TextWater(chart, 3, 'price delta');
 
 async function getData(symbol, interval, limit) {
 	const url = "http://localhost:3000/klines/" + symbol + "/" + interval + "/" + limit;
@@ -106,13 +124,19 @@ async function getData(symbol, interval, limit) {
 			}))
 		);
 
+		// volume SMA
 		volSMAf.setData(data.map(item => ({time: item.time, value: item.vol.fast,})));
 		// volSMAm.setData(data.map(item => ({time: item.time, value: item.vol.med,})));
 		volSMAs.setData(data.map(item => ({time: item.time, value: item.vol.slow,})));
 
+		// trading speed
 		tradeSMAf.setData(data.map(item => ({time: item.time, value: item.trades.fast,})));
 		// tradeSMAm.setData(data.map(item => ({time: item.time, value: item.trades.med,})));
 		tradeSMAs.setData(data.map(item => ({time: item.time, value: item.trades.slow,})));
+
+		// price gradient
+		deltaSeriesOC.setData(data.map(item => ({time: item.time, value: (item.close - item.open),})));
+		deltaSeriesHL.setData(data.map(item => ({time: item.time, value: (item.high - item.low),})));
 
 		l1.setText(symbol + ' / ' + interval);
 
@@ -127,15 +151,6 @@ const iks = getData("BTCUSDT", "1h", 500);
 chart.timeScale().fitContent();
 
 
-
-const l1 = new Legenda('tv_chart');
-// l1.setText('patka');
-
-const tw1 = new TextWater(chart, 1, 'volume');
-tw1.setText('volume');
-
-const w2 = new TextWater(chart, 2, 'trading speed');
-w2.setText('trades');
 
 //////////////////////
 // Series primitive
