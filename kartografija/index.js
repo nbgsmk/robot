@@ -8,9 +8,7 @@ import {
 } from "./js/lightweight-charts.standalone.development.mjs";
 import { Legenda } from "./zjs/Legenda.js";
 import { TextWater } from './zjs/TextWater.js';
-// import {SMA} from 'trading-signals';
-// import {TEMA} from "indicatorts";
-// import {ma} from "moving-averages";
+
 
 const chartOptions = {
 	layout: {
@@ -48,33 +46,31 @@ const priceSeries = chart.addSeries(CandlestickSeries, {
 	priceFormat: {
 			type: 'price',	// percent | price | volume
 		},
-});
+	}, 0, );
 const volumeSeries = chart.addSeries(HistogramSeries, {
 		// title: 'volume',
-		color: '#05530522',
+		color: '#05530511',
 		lineWidth: 1,
 		priceFormat: {
 			type: 'volume',
 		},
-	},
-	1 // Pane index
-);
+	}, 1, );
 const tradeSeries = chart.addSeries(HistogramSeries, {
-		// title: 'volume',
-		color: '#05530522',
+		// title: 'trades',
+		color: '#05530511',
 		lineWidth: 1,
 		priceFormat: {
 			type: 'volume',
 		},
-	},
-	2 // Pane index
-);
+	}, 2, );
 
-const volSMAf = chart.addSeries(LineSeries, { color: '#05530599', lineWidth: 1, priceFormat: {type: 'volume',},}, 1,);
-const volSMAs = chart.addSeries(LineSeries, { color: '#05530599', lineWidth: 1, priceFormat: {type: 'volume',},}, 1,);
+const volSMAf = chart.addSeries(LineSeries, { color: '#02bb99', lineWidth: 1, priceFormat: {type: 'volume',},}, 1,);
+const volSMAm = chart.addSeries(LineSeries, { color: '#029999', lineWidth: 1, priceFormat: {type: 'volume',},}, 1,);
+const volSMAs = chart.addSeries(LineSeries, { color: '#025599', lineWidth: 1, priceFormat: {type: 'volume',},}, 1,);
 
-const tradeSMAf = chart.addSeries(LineSeries, { color: '#05530599', lineWidth: 1, priceFormat: {type: 'volume',},}, 2,);
-const tradeSMAs = chart.addSeries(LineSeries, { color: '#05530599', lineWidth: 1, priceFormat: {type: 'volume',},}, 2,);
+const tradeSMAf = chart.addSeries(LineSeries, { color: '#02bb99', lineWidth: 1, priceFormat: {type: 'volume',},}, 2,);
+const tradeSMAm = chart.addSeries(LineSeries, { color: '#029999', lineWidth: 1, priceFormat: {type: 'volume',},}, 2,);
+const tradeSMAs = chart.addSeries(LineSeries, { color: '#025599', lineWidth: 1, priceFormat: {type: 'volume',},}, 2,);
 
 
 
@@ -88,24 +84,35 @@ async function getData(symbol, interval, limit) {
 		const data = await response.json();
 		console.log(data);
 
-		priceSeries.setData(data);
+		priceSeries.setData(
+			data.map(item => ({
+				time: item.time,
+				open: item.open,
+				high: item.high,
+				low: item.low,
+				close: item.close,
+			}))
+		);
 		volumeSeries.setData(
 			data.map(item => ({
 				time: item.time,
-				value: item.volume,
+				value: item.vol.raw,
 			}))
 		);
 		tradeSeries.setData(
 			data.map(item => ({
 				time: item.time,
-				value: item.numtrades
+				value: item.trades.raw,
 			}))
 		);
 
-		volSMAf.setData(data.map(item => ({time: item.time, value: item.volumeFast,})));
-		volSMAs.setData(data.map(item => ({time: item.time, value: item.volumeSlow,})));
-		tradeSMAf.setData(data.map(item => ({time: item.time, value: item.numtradesFast,})));
-		tradeSMAs.setData(data.map(item => ({time: item.time, value: item.numtradesSlow,})));
+		volSMAf.setData(data.map(item => ({time: item.time, value: item.vol.fast,})));
+		// volSMAm.setData(data.map(item => ({time: item.time, value: item.vol.med,})));
+		volSMAs.setData(data.map(item => ({time: item.time, value: item.vol.slow,})));
+
+		tradeSMAf.setData(data.map(item => ({time: item.time, value: item.trades.fast,})));
+		// tradeSMAm.setData(data.map(item => ({time: item.time, value: item.trades.med,})));
+		tradeSMAs.setData(data.map(item => ({time: item.time, value: item.trades.slow,})));
 
 		l1.setText(symbol + ' / ' + interval);
 
@@ -115,7 +122,7 @@ async function getData(symbol, interval, limit) {
 	}
 }
 
-const iks = getData("BTCUSDT", "5m", 500);
+const iks = getData("BTCUSDT", "1h", 500);
 
 chart.timeScale().fitContent();
 
@@ -125,7 +132,7 @@ const l1 = new Legenda('tv_chart');
 // l1.setText('patka');
 
 const tw1 = new TextWater(chart, 1, 'volume');
-tw1.setText('vol');
+tw1.setText('volume');
 
 const w2 = new TextWater(chart, 2, 'trading speed');
 w2.setText('trades');

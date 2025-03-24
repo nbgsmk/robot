@@ -85,23 +85,7 @@ app.listen(lp, () => {
 	console.log('server na portu http://localhost:' + lp);
 })
 
-const sma = new SMA(3);
-const sma7 = new SMA(7);
-
-// You can add values individually:
-sma.add(40);
-sma.add(30);
-sma.add(20);
-sma.updates([70, 90, 21]);
-sma.add('10');					// add string values
-sma.replace('40');		// replace a previous value (useful for live charting):
-sma.add(new Big(30.0009));		// add arbitrary-precision decimals:
-
-console.log("is it stable? " + sma.isStable);
-console.log(sma.getResult()?.toFixed());
-// console.log(sma.getResultOrThrow().toFixed(2)); // 2 decimals
-console.log('lo ' + sma.lowest?.toFixed(2)); // "23.33"
-console.log('hi ' + sma.highest?.toFixed(2)); // "53.33"
+console.log(new Date(8.64e15).toString());
 
 app.get('/', async (req, res) => {
 	try {
@@ -144,31 +128,50 @@ app.get('/klines/:symbol/:interval/:limit', async (req, res) => {
 		const response = await ky.get(reqs, reqsOpcije);
 		const data = await response.json();
 
-		let f = 5;
-		let s = 20;
-		let volSmaF = new SMA(f);
-		let volSmaS = new SMA(s);
-		let tradeSmaF = new SMA(f)
-		let tradeSmaS = new SMA(s);
+		const f = 5;
+		const m = 20;
+		const s = 50;
+		const volSmaF = new SMA(f);
+		const volSmaM = new SMA(m);
+		const volSmaS = new SMA(s);
 
-		let klinedata = data.map((d) => ({
-			time: d[0] / 1000,
-			open: d[1] * 1,
-			high: d[2] * 1,
-			low: d[3] * 1,
-			close: d[4] * 1,
+		const tradeSmaF = new SMA(f)
+		const tradeSmaM = new SMA(m)
+		const tradeSmaS = new SMA(s);
 
-			volume: d[5] *1,
-			volumeFast: volSmaF.add(d[5]) *1,
-			volumeSlow: volSmaS.add(d[5]) *1,
+		const vv = data.map((item, index) => ({
+			// i: index,
+			// time: item[0] / 1000,
+			raw: item[5] *1,
+			fast: volSmaF.add(item[5]) *1,
+			med: volSmaM.add(item[5]) *1,
+			slow: volSmaS.add(item[5]) *1,
+		}))
+		const tt = data.map((item, index) => ({
+			// i: index,
+			// time: item[0] / 1000,
+			raw: item[8] *1,
+			fast: tradeSmaF.add(item[8]) *1,
+			med: tradeSmaM.add(item[8]) *1,
+			slow: tradeSmaS.add(item[8]) *1,
+		}))
 
-			numtrades: d[8] *1,
-			numtradesFast: tradeSmaF.add(d[8]) *1,
-			numtradesSlow: tradeSmaS.add(d[8]) *1,
 
+		const rezult = data.map((item, index) => ({
+			time: item[0] / 1000,
+			open: item[1] * 1,
+			high: item[2] * 1,
+			low: item[3] * 1,
+			close: item[4] * 1,
+
+			ind: index,
+
+			vol: vv[index],
+
+			trades: tt[index],
 		}));
 
-		res.status(200).json(klinedata);
+		res.status(200).json(rezult);
 
 	} catch (err) {
 		console.log(err);
@@ -177,3 +180,60 @@ app.get('/klines/:symbol/:interval/:limit', async (req, res) => {
 });
 
 
+app.get('/nested_map', async (req, res) => {
+	try {
+		const reqs = 'https://api.binance.com/api/v3/klines?symbol=BTCUSDT&interval=1m&limit=5';
+		const reqsOpcije = { name: 'Alice', age: 25 };
+		const response = await ky.get(reqs, reqsOpcije);
+		const data = await response.json();
+
+		const f = 1;
+		const m = 2;
+		const s = 5;
+		const volSmaF = new SMA(f);
+		const volSmaM = new SMA(m);
+		const volSmaS = new SMA(s);
+
+		const tradeSmaF = new SMA(f)
+		const tradeSmaM = new SMA(m)
+		const tradeSmaS = new SMA(s);
+
+
+		const v = data.map((item, index) => ({
+			i: index,
+			time: item[0] / 1000,
+			raw: item[5] *1,
+			fast: volSmaF.add(item[5]) *1,
+			med: volSmaM.add(item[5]) *1,
+			slow: volSmaS.add(item[5]) *1,
+		}))
+		const t = data.map((item, index) => ({
+			i: index,
+			time: item[0] / 1000,
+			raw: item[8] *1,
+			fast: tradeSmaF.add(item[8]) *1,
+			med: tradeSmaM.add(item[8]) *1,
+			slow: tradeSmaS.add(item[8]) *1,
+		}))
+
+		const rezult = data.map((item, index) => ({
+			time: item[0] / 1000,
+			open: item[1] * 1,
+			high: item[2] * 1,
+			low: item[3] * 1,
+			close: item[4] * 1,
+
+			ind: index,
+
+			vol: v[index],
+
+			trade: t[index],
+		}));
+
+		res.status(200).json(rezult);
+
+	} catch (err) {
+		console.log(err);
+		res.status(500).send(err);
+	}
+});
