@@ -39,9 +39,9 @@ const chartOptions = {
 };
 const chart = createChart(document.getElementById('tv_chart'), chartOptions);
 
-//////////////////
-// uvek postoji
-//////////////////
+/////////////////////////////////////
+// Histogrami su uglavnom raw data
+/////////////////////////////////////
 // price, volume, number of trades
 const priceSeries = chart.addSeries(CandlestickSeries, {
 	// title: 'ticker',
@@ -51,7 +51,7 @@ const priceSeries = chart.addSeries(CandlestickSeries, {
 			type: 'price',	// percent | price | volume
 		},
 	}, 0, );
-const volumeSeries = chart.addSeries(HistogramSeries, {
+const volumeHist = chart.addSeries(HistogramSeries, {
 		// title: 'volume',
 		color: '#05530511',
 		lineWidth: 1,
@@ -59,7 +59,7 @@ const volumeSeries = chart.addSeries(HistogramSeries, {
 			type: 'volume',
 		},
 	}, 1, );
-const tradeSeries = chart.addSeries(HistogramSeries, {
+const tradeHist = chart.addSeries(HistogramSeries, {
 		// title: 'trades',
 		color: '#05530511',
 		lineWidth: 1,
@@ -67,6 +67,14 @@ const tradeSeries = chart.addSeries(HistogramSeries, {
 			type: 'volume',
 		},
 	}, 2, );
+const deltaHist = chart.addSeries(HistogramSeries, {
+		// title: 'trades',
+		color: '#05530511',
+		lineWidth: 1,
+		priceFormat: {
+			type: 'volume',
+		},
+	}, 3, );
 
 ////////////////////////
 // indikatori po zelji
@@ -82,15 +90,19 @@ const tradeSMAm = chart.addSeries(LineSeries, { color: '#029999', lineWidth: 1, 
 const tradeSMAs = chart.addSeries(LineSeries, { color: '#025599', lineWidth: 1, priceFormat: {type: 'volume',},}, 2,);
 
 // price delta
-const deltaSeriesOC = chart.addSeries(LineSeries, { color: '#920000', lineWidth: 1, priceFormat: {type: 'volume',},}, 3,);
-const deltaSeriesHL = chart.addSeries(LineSeries, { color: '#02bb99', lineWidth: 1, priceFormat: {type: 'volume',},}, 3,);
+const deltaSeriesSMAf = chart.addSeries(LineSeries, { color: '#02bb9999', lineWidth: 1, priceFormat: {type: 'volume',},}, 3,);
+const deltaSeriesSMAm = chart.addSeries(LineSeries, { color: '#02bb9999', lineWidth: 1, priceFormat: {type: 'volume',},}, 3,);
+const deltaSeriesSMAs = chart.addSeries(LineSeries, { color: '#02bb9999', lineWidth: 1, priceFormat: {type: 'volume',},}, 3,);
+// const deltaSeriesHL = chart.addSeries(LineSeries, { color: '#920000', lineWidth: 1, priceFormat: {type: 'volume',},}, 3,);
+
 
 
 // LEGENDE
 const l1 = new Legenda('tv_chart');
 const wmV = new TextWater(chart, 1, 'volume');
 const wmS = new TextWater(chart, 2, 'trading speed');
-const wmD = new TextWater(chart, 3, 'price delta');
+const pdscale = 5;
+const wmD = new TextWater(chart, 3, 'price delta * ' + pdscale);
 
 async function getData(symbol, interval, limit) {
 	const url = "http://localhost:3000/klines/" + symbol + "/" + interval + "/" + limit;
@@ -111,13 +123,13 @@ async function getData(symbol, interval, limit) {
 				close: item.close,
 			}))
 		);
-		volumeSeries.setData(
+		volumeHist.setData(
 			data.map(item => ({
 				time: item.time,
 				value: item.vol.raw,
 			}))
 		);
-		tradeSeries.setData(
+		tradeHist.setData(
 			data.map(item => ({
 				time: item.time,
 				value: item.trades.raw,
@@ -135,9 +147,11 @@ async function getData(symbol, interval, limit) {
 		tradeSMAs.setData(data.map(item => ({time: item.time, value: item.trades.slow,})));
 
 		// price gradient
-		deltaSeriesOC.setData(data.map(item => ({time: item.time, value: (item.close - item.open),})));
-		// deltaSeriesHL.setData(data.map(item => ({time: item.time, value: (item.high - item.low),})));
-		deltaSeriesHL.setData(data.map(item => ({time: item.time, value: item.delta.fast,})));
+		deltaHist.setData(data.map(item => ({time: item.time, value: item.delta.raw,})));
+		deltaSeriesSMAf.setData(data.map(item => ({time: item.time, value: item.delta.fast *pdscale,})));
+		// deltaSeriesSMAm.setData(data.map(item => ({time: item.time, value: item.delta.med *pdscale,})));
+		deltaSeriesSMAs.setData(data.map(item => ({time: item.time, value: item.delta.slow *pdscale,})));
+		// deltaSeriesHL.setData(data.map(item => ({time: item.time, value: item.delta.fast,})));
 
 		l1.setText(symbol + ' / ' + interval);
 
@@ -147,7 +161,7 @@ async function getData(symbol, interval, limit) {
 	}
 }
 
-const iks = getData("BTCUSDT", "1h", 1000);
+const iks = getData("BTCUSDT", "15m", 1000);
 
 chart.timeScale().fitContent();
 

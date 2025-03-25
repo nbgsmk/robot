@@ -1,7 +1,7 @@
 import express from 'express';
 import cors from 'cors';
 import ky from "ky";
-import {Big, SMA} from 'trading-signals';
+import {Big, EMA, SMA} from 'trading-signals';
 
 
 /*
@@ -139,7 +139,9 @@ app.get('/klines/:symbol/:interval/:limit', async (req, res) => {
 		const tradeSmaM = new SMA(m)
 		const tradeSmaS = new SMA(s);
 
-		const deltaSma = new SMA(20);
+		const deltaSmaF = new EMA(f);
+		const deltaSmaM = new EMA(m);
+		const deltaSmaS = new EMA(s);
 
 		const vv = data.map((item, index) => ({
 			// i: index,
@@ -160,8 +162,10 @@ app.get('/klines/:symbol/:interval/:limit', async (req, res) => {
 		const dd = data.map((item, index) => ({
 			// i: index,
 			// time: item[0] / 1000,
-			raw: item[8] *1,
-			fast: deltaSma.add(new Big(item[4] - item[1])) *1,
+			raw: (item[4] - item[1]),
+			fast: deltaSmaF.add(new Big(item[4] - item[1])) *1,
+			med: deltaSmaM.add(new Big(item[4] - item[1])) *1,
+			slow: deltaSmaS.add(new Big(item[4] - item[1])) *1,
 		}))
 
 
