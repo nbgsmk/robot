@@ -5,9 +5,9 @@ import {
 	CandlestickSeries,
 	HistogramSeries,
 	LineStyle
-} from "./js/lightweight-charts.standalone.development.mjs";
-import { Legenda } from "./zjs/Legenda.js";
-import { TextWater } from './zjs/TextWater.js';
+} from "./proxy/tradingViewJs/lightweight-charts.standalone.development.mjs";
+import { Legenda } from "./proxy/zjs/Legenda.js";
+import { TextWater } from './proxy/zjs/TextWater.js';
 
 
 const chartOptions = {

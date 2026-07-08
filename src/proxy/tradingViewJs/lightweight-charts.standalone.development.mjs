@@ -13958,7 +13958,7 @@ class TextWatermark {
  * @returns Image watermark wrapper.
  *
  * @example
- * ```js
+ * ```tradingViewJs
  * import { createTextWatermark } from 'lightweight-charts';
  *
  * const firstPane = chart.panes()[0];
@@ -14150,7 +14150,7 @@ class ImageWatermark {
  * @returns Image watermark wrapper.
  *
  * @example
- * ```js
+ * ```tradingViewJs
  * import { createImageWatermark } from 'lightweight-charts';
  *
  * const firstPane = chart.panes()[0];
@@ -14770,7 +14770,7 @@ class SeriesMarkersPrimitiveWrapper extends SeriesPrimitiveAdapter {
  * @param markers - An array of markers to be displayed on the series.
  *
  * @example
- * ```js
+ * ```tradingViewJs
  * import { createSeriesMarkers } from 'lightweight-charts';
  *
  *	const seriesMarkers = createSeriesMarkers(
@@ -15099,7 +15099,7 @@ class SeriesUpDownMarkerPrimitiveWrapper extends SeriesPrimitiveAdapter {
  * @returns Api for Series Up Down Marker Plugin. {@link ISeriesUpDownMarkerPluginApi}
  *
  * @example
- * ```js
+ * ```tradingViewJs
  * import { createUpDownMarkers, createChart, LineSeries } from 'lightweight-charts';
  *
  * const chart = createChart('container');

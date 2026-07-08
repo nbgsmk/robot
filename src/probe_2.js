@@ -1,4 +1,4 @@
-import { createChart, LineSeries, CandlestickSeries, HistogramSeries } from './js/lightweight-charts.standalone.development.mjs';
+import { createChart, LineSeries, CandlestickSeries, HistogramSeries } from './proxy/tradingViewJs/lightweight-charts.standalone.development.mjs';
 
 const chartOptions = { layout: { textColor: 'black', background: { type: 'solid', color: 'white' } } };
 const chartContainer = document.getElementById('tv_chart');

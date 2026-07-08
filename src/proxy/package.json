@@ -1,10 +1,10 @@
 {
   "name": "prox2",
   "version": "1.0.0",
-  "main": "index.js",
+  "main": "run-proxy.js",
   "type": "module",
   "scripts": {
-    "start proxy": "node --watch index.js",
+    "start proxy": "node --watch run-proxy.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],

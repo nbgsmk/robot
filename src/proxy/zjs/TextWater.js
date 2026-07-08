@@ -1,5 +1,5 @@
 
-import { createTextWatermark } from "../js/lightweight-charts.standalone.development.mjs";
+import { createTextWatermark } from "../tradingViewJs/lightweight-charts.standalone.development.mjs";
 
 /**
  * TextWaterMark for a panelId (zero-based)
