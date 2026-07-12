@@ -161,7 +161,7 @@ async function getData(symbol, interval, limit) {
 	}
 }
 
-const iks = getData("BTCUSDT", "15m", 1000);
+const iks = getData("BTCUSDT", "1d", 200);
 
 chart.timeScale().fitContent();
 

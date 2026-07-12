@@ -2,6 +2,12 @@ import express from 'express';
 import cors from 'cors';
 import ky from "ky";
 import {Big, EMA, SMA} from 'trading-signals';
+import { fileURLToPath } from 'url';
+import { dirname } from 'path';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+const srcDir = dirname(__dirname);
 
 
 /*
@@ -80,6 +86,16 @@ https://www.npmjs.com/package/moving-averages?activeTab=versions
 
 const app = express();
 app.use(cors());
+
+// Set CSP header to allow inline styles (required for lightweight-charts)
+app.use((req, res, next) => {
+	res.setHeader('Content-Security-Policy', "default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self'");
+	next();
+});
+
+// Serve static files from the src directory (absolute path)
+app.use(express.static(srcDir));
+
 const lp = 3000;
 app.listen(lp, () => {
 	console.log('server na portu http://localhost:' + lp);
@@ -89,14 +105,7 @@ console.log(new Date().toString());
 
 app.get('/', async (req, res) => {
 	try {
-		const pomoc_json = { name: 'Sve je ok', age: 25 };
-		const pomoc =
-			"<head> <title>Pomoc</title></head>" +
-			"  <p>Ovako:\n" +
-			"  <p>go to <a href=\"/klines/BTCUSDT/1m\">klines BTCUSDT 1m</a></p>\n" +
-			"  <p>go to <a href=\"/klines_test/\">klines_test</a></p>\n" +
-			"  <p>go to <a href=\"/users/\">users</a></p>\n";
-		res.status(200).send(pomoc);
+		res.sendFile('index.html', { root: srcDir });
 	} catch (err) {
 		console.log(err);
 		res.status(500).send(err);
